@@ -1,50 +1,75 @@
 # ⚔️ USM KRS WARRIOR (SIMA Automation)
 
-**Ultimate KRS War Bot for Universitas Semarang (USM)**
+**Automasi KRS SIMA -- Universitas Semarang (USM)**
 
-Script otomasi berbasis Python untuk membantu mahasiswa USM mendapatkan mata kuliah incaran di sistem **SIMA** secara cepat, tepat, dan otomatis. Dirancang dengan tampilan _Clean Mode_ (anti-spam terminal) dan dilengkapi fitur keamanan jadwal.
+Script berbasis Python untuk membantu mahasiswa Universitas Semarang
+mendapatkan mata kuliah incaran secara cepat, tepat, dan otomatis
+melalui sistem SIMA.
+
+Dirancang dengan tampilan **Clean Mode** (tanpa spam terminal), validasi
+login cerdas, dan sistem prioritas kelas.
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python)
 ![Status](https://img.shields.io/badge/Status-Stable-green?style=for-the-badge)
-![IG](https://img.shields.io/badge/Creator-@rffdzky-purple?style=for-the-badge&logo=instagram)
+![Creator](https://img.shields.io/badge/Creator-rffdzky-purple?style=for-the-badge&logo=github)
 
 ---
 
-## 🔥 Fitur Utama (v.Final)
+## 🚀 Fitur Utama
 
-- **🛡️ Safety First:** Dilengkapi peringatan dini (Safety Alert) untuk menampilkan total target dan memastikan user sudah mengecek jadwal sebelum eksekusi.
-- **👀 Clean Mode UI:** Tampilan terminal yang rapi. Status scanning hanya satu baris yang diperbarui otomatis (tidak _scrolling_ ke bawah), kecuali saat berhasil mengambil mata kuliah.
-- **🔐 Smart Login Validation:** Memastikan Username/Password benar dengan membaca respon server SIMA (bukan hanya cek cookie).
-- **⚡ Priority System:** Mendukung prioritas kelas.
-  - _Contoh:_ Cari kelas **A1** dulu. Jika penuh, otomatis cari kelas **A**.
-- **📊 Total Matkul Counter:** Menghitung jumlah mata kuliah yang akan diburu secara otomatis.
-- **📝 Format Validator:** Mendeteksi kesalahan penulisan di `target.txt` (misal: kurang koma) agar bot tidak _crash_.
+- 🛡️ **Safety Alert System**\
+  Menampilkan total target dan peringatan sebelum eksekusi untuk
+  memastikan jadwal sudah dicek.
+
+- 👀 **Clean Mode UI**\
+  Status monitoring hanya satu baris dinamis (tidak memenuhi layar).
+
+- 🔐 **Smart Login Validation**\
+  Validasi login berdasarkan respons server SIMA, bukan hanya
+  pengecekan cookie.
+
+- ⚡ **Priority Class System**\
+  Mendukung pencarian kelas berdasarkan prioritas.\
+  Contoh: Cari kelas **A1** terlebih dahulu. Jika penuh, otomatis cari
+  kelas **A**.
+
+- 📊 **Auto Target Counter**\
+  Menghitung total mata kuliah yang diburu secara otomatis.
+
+- 📝 **Format Validator**\
+  Mendeteksi kesalahan format di `target.txt` agar bot tidak crash.
 
 ---
 
-## 🛠️ Persiapan (Installation)
+## 🛠️ Instalasi
 
-Pastikan komputer Anda sudah terinstall **Python 3**.
+Pastikan sudah terinstall **Python 3.8 atau lebih baru**.
 
-1.  **Clone / Download Repository ini**
-2.  **Install Library Pendukung**
-    Buka terminal/CMD di folder bot, lalu ketik:
-    ```bash
-    pip install requests beautifulsoup4 urllib3
-    ```
+### 1️⃣ Clone / Download Repository
+
+Download atau clone repository ini ke komputer Anda.
+
+### 2️⃣ Install Dependencies
+
+Buka terminal/CMD di folder project, lalu jalankan:
+
+```bash
+pip install requests beautifulsoup4 urllib3
+```
 
 ---
 
-## ⚙️ Cara Pakai
+## ⚙️ Cara Penggunaan
 
-### 1. Edit File `target.txt`
+### 1️⃣ Buat File `target.txt`
 
-Buat file bernama `target.txt`. Masukkan daftar mata kuliah dengan format:
-`NAMA_MATKUL, KELAS_PRIORITAS_1, KELAS_PRIORITAS_2`
+Buat file bernama `target.txt`, lalu isi dengan format berikut:
 
-**⚠️ PENTING:** Jangan lupa tanda **KOMA (,)** pemisah antar nama dan kelas!
+    NAMA_MATKUL, KELAS_PRIORITAS_1, KELAS_PRIORITAS_2
 
-**Contoh Isi `target.txt`:**
+⚠️ Gunakan tanda koma (,) sebagai pemisah.
+
+### Contoh `target.txt`
 
 ```text
 PENGGALIAN DATA, A1
@@ -53,47 +78,100 @@ MANAJEMEN RISIKO TI, B1
 ETIKA PROFESI, A, A1
 ```
 
-(Artinya: Untuk Transformasi Digital, bot cari kelas A1 dulu. Kalau penuh, cari kelas A).
-
-2. Atur Akun (Di dalam Script)
-   Buka file krswar.py, cari bagian paling atas dan isi NIM & Password SIMA kamu:
-   MY_NIM = "G.111.xx.xxxx"
-   MY_PASSWORD = "PasswordSimaKamu"
-
-3. Jalankan Bot
-   Buka terminal dan ketik:
-   python krswar.py
-
-📸 Preview Tampilan
-
-1. Peringatan Awal (Safety Check):
-   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   ⚠️ PERINGATAN SEBELUM PERANG ⚠️
-   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   TOTAL TARGET: 4 MATA KULIAH
+Penjelasan: - Untuk Transformasi Digital, bot akan mencari kelas **A1**
+terlebih dahulu. - Jika penuh, bot otomatis mencari kelas **A**.
 
 ---
 
-1. Pastikan JADWAL target.txt tidak bentrok satu sama lain.
-2. Pastikan JADWAL tidak bentrok dengan matkul yg sudah diambil.
-3. Pastikan SISA SKS CUKUP (Max 24).
+### 2️⃣ Konfigurasi Akun
+
+Buka file `krswar.py`, lalu edit bagian berikut di atas script:
+
+```python
+MY_NIM = "G.111.xx.xxxx"
+MY_PASSWORD = "PasswordSimaKamu"
+```
+
+Isi sesuai akun SIMA Anda.
 
 ---
 
-👉 Tekan [ENTER] jika sudah yakin & ingin melanjutkan...
+### 3️⃣ Jalankan Bot
 
-2. Mode Monitoring (Scanning):
-   [Scan: 154] 🔒 Pending: 4 | ⏳ Load: 0.22s | ⚡
-   Baris ini akan terus berkedip di tempat yang sama, tidak memenuhi layar)
+Di terminal:
 
-3. Saat Berhasil (Success):
+```bash
+python krswar.py
+```
 
-   > > > 🚀 MENEMBAK: MANAJEMEN RISIKO TI [KELAS B1] <<<
-   > > > ✅ [SUKSES] MANAJEMEN RISIKO TI BERHASIL DIAMBIL!
+---
 
-❓ FAQ (Troubleshooting)
-Masalah,Penyebab & Solusi
-Login Ditolak,Password atau NIM salah. Cek konfigurasi di script.
-[SKIP] Baris Salah Format,"Anda lupa menaruh tanda koma (,) di file target.txt."
-❌ [GAGAL] Server: SKS,Jatah SKS habis (Max 24). Bot tidak menghapus matkul lama. Hapus manual di web SIMA.
-❌ [GAGAL] Server: Bentrok,Jadwal matkul incaran bertabrakan dengan matkul yang sudah diambil.
+## 📸 Preview Tampilan
+
+### 🛡️ Safety Check
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ⚠️ PERINGATAN SEBELUM EKSEKUSI ⚠️
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    TOTAL TARGET: 4 MATA KULIAH
+
+    1. Pastikan jadwal di target.txt tidak bentrok.
+    2. Pastikan tidak bentrok dengan mata kuliah yang sudah diambil.
+    3. Pastikan sisa SKS mencukupi (maksimal 24 SKS).
+
+    👉 Tekan [ENTER] untuk melanjutkan...
+
+---
+
+### 🔎 Mode Monitoring
+
+    [Scan: 154] 🔒 Pending: 4 | ⏳ Load: 0.22s | ⚡
+
+Status akan terus diperbarui di baris yang sama tanpa membuat terminal
+penuh.
+
+---
+
+### 🚀 Saat Berhasil
+
+    >>> 🚀 MENEMBAK: MANAJEMEN RISIKO TI [KELAS B1] <<<
+    >>> ✅ [SUKSES] MANAJEMEN RISIKO TI BERHASIL DIAMBIL!
+
+---
+
+## ❓ Troubleshooting
+
+---
+
+Masalah Penyebab Solusi
+
+---
+
+Login Ditolak NIM atau Password salah Periksa konfigurasi di
+`krswar.py`
+
+\[SKIP\] Baris Salah Format `target.txt` Pastikan ada tanda
+Format tidak sesuai koma (,)
+
+❌ \[GAGAL\] Server: SKS SKS sudah mencapai batas Hapus mata kuliah lama
+(maks 24) secara manual di SIMA
+
+❌ \[GAGAL\] Server: Jadwal bertabrakan Periksa ulang jadwal
+Bentrok sebelum menjalankan
+bot
+
+---
+
+---
+
+## ⚠️ Disclaimer
+
+Gunakan dengan bijak dan bertanggung jawab.\
+Segala risiko penggunaan menjadi tanggung jawab pengguna.
+
+---
+
+## 👨‍💻 Creator
+
+**rffdzky**
