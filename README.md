@@ -116,9 +116,9 @@ python krswar.py
 
     TOTAL TARGET: 4 MATA KULIAH
 
-    1. Pastikan jadwal di target.txt tidak bentrok.
-    2. Pastikan tidak bentrok dengan mata kuliah yang sudah diambil.
-    3. Pastikan sisa SKS mencukupi (maksimal 24 SKS).
+    1. Pastikan JADWAL target.txt tidak ada matkul/ruangan salah ketik
+    2. Pastikan SISA SKS CUKUP (Max 24).
+    3. Bot ini akan mengeksekusi OTOMATIS begitu kuota tersedia.
 
     👉 Tekan [ENTER] untuk melanjutkan...
 
