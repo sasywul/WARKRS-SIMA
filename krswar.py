@@ -12,8 +12,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # ==========================================
 # ⚙️ KONFIGURASI USER
 # ==========================================
-MY_NIM      = "G.XXX.XX.XXXX"
-MY_PASSWORD = "XXXXX"
+MY_NIM      = "G.xxx.xx.xxx"
+MY_PASSWORD = "xxxxx"
 FILE_TARGET = "target.txt"
 
 HEADERS_BROWSER = {
@@ -63,17 +63,30 @@ def get_session_valid(nim, password):
         token_val = match.group(1)
         
         payload = {"username": nim, "token": token_val, "password": password}
+        
         res_login = session.post("https://sima.usm.ac.id/login", data=payload, timeout=20, verify=False)
 
-        konten_kecil = res_login.text.lower()
-        if "belum sesuai" in konten_kecil or "maaf user" in konten_kecil:
-            return None, "LOGIN DITOLAK: Password/NIM Salah!"
-        elif "alert-danger" in konten_kecil:
-            return None, "LOGIN GAGAL: Terdeteksi peringatan dari server."
-        else:
-            session.post("https://sima.usm.ac.id/app/routes", data={"id_aplikasi": "05494017904153", "level_key": "6f1e80f8-4fb3-11ea-9ef2-1cb72c27dd68", "id_bidang": "1"}, verify=False)
-            print("[LOGIN] BERHASIL! Akses diberikan.")
+        url_akhir = res_login.url  
+        #print(f"   [DEBUG] Mendarat di: {url_akhir}") 
+
+        if "/app" in url_akhir:
+            session.post("https://sima.usm.ac.id/app/routes", data={
+                "id_aplikasi": "05494017904153", 
+                "level_key": "6f1e80f8-4fb3-11ea-9ef2-1cb72c27dd68", 
+                "id_bidang": "1"
+            }, verify=False)
+            
+            print("[LOGIN] ✅ BERHASIL! (Redirect ke APP terkonfirmasi)")
             return session, None
+            
+        else:
+            # Jika TIDAK ke /app (misal malah ke halaman depan lagi), berarti GAGAL.
+            # Kita coba baca pesan errornya sekalian biar tau kenapa.
+            soup = BeautifulSoup(res_login.text, 'html.parser')
+            alert = soup.find('div', class_=re.compile(r'alert'))
+            msg = alert.get_text(strip=True) if alert else "Password/User Salah (Tidak masuk ke /app)"
+            
+            return None, f"LOGIN GAGAL: {msg}"
 
     except Exception as e: return None, f"Error Koneksi: {e}"
 
@@ -95,7 +108,7 @@ def eksekusi_tembak(session, url, payload, headers, nama, kelas):
 
 def war_engine_start():
     print("="*60)
-    print("   SIMA WAR - IG @rffdzky (FINAL)")
+    print("   SIMA WAR - IG @rffdzky (RAPID FIRE MODE)")
     print("="*60)
     
     # 1. LOAD TARGET
@@ -104,20 +117,18 @@ def war_engine_start():
     
     # 2. WARNING ALERT
     print("\n" + "!"*60)
-    print("⚠️  PERINGATAN SEBELUM PERANG  ⚠️")
+    print("⚠️  PERINGATAN MODE RAPID FIRE  ⚠️")
     print("!"*60)
     print(f"   TOTAL TARGET: {total_target} MATA KULIAH")
     print("-" * 60)
-    print("1. Pastikan JADWAL target.txt tidak ada matkul/ruangan salah ketik ")
-    print("2. Pastikan SISA SKS CUKUP (Max 24).")
-    print("3. Bot ini akan mengeksekusi OTOMATIS begitu kuota tersedia.")
+    print("1. Bot akan menembak SEMUA slot yang terbuka SEKALIGUS.")
+    print("2. Pastikan SISA SKS CUKUP untuk mengambil banyak matkul.")
+    print("3. Risiko bentrok jadwal ditanggung penumpang.")
     print("-" * 60)
     
-    # PAUSE DISINI BIAR BACA DULU
     try:
         input("👉 Tekan [ENTER] jika sudah yakin & ingin melanjutkan...")
-    except KeyboardInterrupt:
-        sys.exit()
+    except KeyboardInterrupt: sys.exit()
 
     # 3. LOGIN
     print("-" * 60)
@@ -135,6 +146,7 @@ def war_engine_start():
     attempt = 1
     while True:
         try:
+            # Ambil hanya target yang belum SUKSES
             sisa_target = [t for t in daftar_target if t['status'] == 'PENDING']
             total_pending = len(sisa_target)
             
@@ -154,18 +166,26 @@ def war_engine_start():
             soup = BeautifulSoup(resp.text, 'html.parser')
             cards = soup.find_all('div', class_='card')
             
+            hits_in_this_round = 0 # Menghitung berapa kali nembak di ronde ini
+
+            # --- LOOPING PENGECEKAN (TANPA BREAK UTAMA) ---
             for target in sisa_target:
                 match_cards = [c for c in cards if target['nama'] in c.get_text().upper()]
 
                 if not match_cards: continue 
 
+                # Cek prioritas kelas
                 for p_kelas in target['kelas']:
+                    # Flag agar tidak nembak 2 kelas untuk 1 matkul yg sama
+                    sudah_ditembak = False 
+                    
                     p_reg = rf"KELAS\s+{re.escape(p_kelas)}(?!\w)"
                     for c in match_cards:
                         if re.search(p_reg, c.get_text().upper()):
                             form = c.find('form')
                             btn = c.find('button')
                             
+                            # Skip jika tombol disabled
                             if not form or (btn and 'disabled' in btn.attrs):
                                 continue
 
@@ -173,19 +193,31 @@ def war_engine_start():
                             kuota = int(s_kuota.get_text(strip=True)) if s_kuota else 0
 
                             if kuota > 0:
+                                # KETEMU SLOT! SIAPKAN PELURU
                                 payload = {i.get('name'): i.get('value') for i in form.find_all('input', type='hidden')}
                                 h_post = session.headers.copy()
                                 h_post["Content-Type"] = "application/x-www-form-urlencoded"
                                 h_post["Referer"] = url_input
                                 
+                                # DOR! TEMBAK LANGSUNG
                                 if eksekusi_tembak(session, url_simpan, payload, h_post, target['nama'], p_kelas):
                                     target['status'] = 'SUKSES'
                                 else:
                                     target['status'] = 'GAGAL_TEMP'
-                                break
+                                
+                                hits_in_this_round += 1
+                                sudah_ditembak = True
+                                break # Break loop kartu (lanjut ke target matkul berikutnya)
+                    
+                    if sudah_ditembak:
+                        break # Break loop prioritas kelas (lanjut ke target matkul berikutnya)
+            
+            # --- STATUS BAR ---
+            # Jika ada tembakan, kasih enter biar log terbaca
+            prefix = "\n" if hits_in_this_round > 0 else "\r"
             
             status_bar = (
-                f"\r[Scan: {attempt}] "
+                f"{prefix}[Scan: {attempt}] "
                 f"🔒 Pending: {total_pending} "
                 f"| ⏳ Load: {t_load}s "
                 f"| {'✨' if attempt % 2 == 0 else '⚡'}"
