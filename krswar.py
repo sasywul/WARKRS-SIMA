@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 # ⚙️ KONFIGURASI USER
 # ==========================================
 MY_NIM      = "G.111.24.0021"
-MY_PASSWORD = "KKANINADIKRAFI"
+MY_PASSWORD = "xxxx"
 FILE_TARGET = "target.txt"
 
 
