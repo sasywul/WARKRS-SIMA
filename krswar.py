@@ -64,36 +64,51 @@ def load_targets_from_txt(filename):
     if not targets: sys.exit("[ERROR] Target kosong.")
     return targets
 
+def is_cloudflare(resp):
+    server_header = resp.headers.get('Server', '').lower()
+    status_check = resp.status_code in [403, 429, 503]
+    has_cf_html = any(kw in resp.text for kw in ['cf-turnstile', 'challenges.cloudflare.com', 'ray ID:'])
+    return server_header == 'cloudflare' or has_cf_html
+
 def get_session_valid(nim, password):
     print(f"[LOGIN] Menghubungi Server USM ({nim})...")
-    
     session = requests.Session(impersonate="chrome120")
-    
     session.headers = get_smart_headers()
     
     try:
         r_home = session.get("https://sima.usm.ac.id/", timeout=15)
+        
+        # --- CEK CLOUDFLARE DI SINI ---
+        if is_cloudflare(r_home):
+            print("[ALERT] Terdeteksi Cloudflare! Mencoba menembus dengan curl_cffi...")
+        
         soup = BeautifulSoup(r_home.text, 'html.parser')
         el_token = soup.find('input', {'name': 'token'})
         
-        if not el_token: return None, "Token CSRF hilang (Block IP?)"
+        if not el_token:
+            if "Just a moment" in r_home.text:
+                return None, "Stuck di Cloudflare Challenge (Butuh Browser asli)."
+            return None, "Token CSRF hilang (Block IP?)"
+            
         token_val = el_token.get('value')
-        
         payload = {"username": nim, "token": token_val, "password": password}
+        
         res_login = session.post("https://sima.usm.ac.id/login", data=payload, timeout=20)
 
         if "/app" in res_login.url:
+            # Bypass route aplikasi USM
             session.post("https://sima.usm.ac.id/app/routes", data={
                 "id_aplikasi": "05494017904153", 
                 "level_key": "6f1e80f8-4fb3-11ea-9ef2-1cb72c27dd68", 
                 "id_bidang": "1"
             })
-            print("[LOGIN] ✅ BERHASIL (Header Valid & Terpercaya)")
+            print("[LOGIN] ✅ BERHASIL")
             return session, None
         else:
             return None, "Login Gagal (Password salah / Redirect gagal)"
 
-    except Exception as e: return None, f"Error: {e}"
+    except Exception as e: 
+        return None, f"Error: {e}"
 
 def eksekusi_tembak(session, url, payload, nama):
     try:
