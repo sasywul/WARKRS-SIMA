@@ -54,7 +54,7 @@ Download atau clone repository ini ke komputer Anda.
 Buka terminal/CMD di folder project, lalu jalankan:
 
 ```bash
-pip install requests beautifulsoup4 urllib3
+pip install curl-cffi beautifulsoup4
 ```
 
 ---
